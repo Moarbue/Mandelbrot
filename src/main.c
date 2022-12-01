@@ -19,7 +19,7 @@
 #define DEFAULT_YMIN -1.12
 #define DEFAULT_YMAX 1.12
 
-#define MAX_ITERATIONS 1000
+#define MAX_ITERATIONS 100
 
 void glfw_error_callback(int error_code, const char *description);
 void glfw_framebuffer_resize_callback(GLFWwindow *window, int width, int height);
