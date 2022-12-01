@@ -137,6 +137,15 @@ void glfw_error_callback(int error_code, const char *description)
 void glfw_framebuffer_resize_callback(GLFWwindow *window, int width, int height)
 {
     (void)window;
+
+    ymin *= (float)wwidth / width;
+    ymax *= (float)wwidth / width;
+    xmin *= (float)wheight / height;
+    xmax *= (float)wheight / height;
+
+    basey *= (float)wwidth / width;
+    basex *= (float)wheight / height;
+
     wwidth = width;
     wheight = height;
     glViewport(0, 0, width, height);
