@@ -14,6 +14,8 @@
 #define DEFAULT_SCREEN_WIDTH 1000
 #define DEFAULT_SCREEN_HEIGHT 1000
 #define SCROLL_SENSITIVITY 0.25f
+#define DEFAULT_MOVEMENT_X 0.001f
+#define DEFAULT_MOVEMENT_Y 0.001f
 #define DEFAULT_XMIN -2.0
 #define DEFAULT_XMAX 0.47
 #define DEFAULT_YMIN -1.12
@@ -57,6 +59,7 @@ int main()
     }
     glfwSetFramebufferSizeCallback(window, glfw_framebuffer_resize_callback);
     glfwSetScrollCallback(window, glfw_scroll_callback);
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
     glfwMakeContextCurrent(window);
 
     glewExperimental = GL_TRUE;
@@ -94,10 +97,6 @@ int main()
     GLint uymax   = glGetUniformLocation(program, "ymax");
 
     glUniform1i(uiters, MAX_ITERATIONS);
-    glUniform1f(uxmin, xmin);
-    glUniform1f(uxmax, xmax);
-    glUniform1f(uymin, ymin);
-    glUniform1f(uymax, ymax);
 
     glClearColor(0.18, 0.18, 0.18, 1.0);
 
@@ -107,6 +106,10 @@ int main()
 
         glUniform1i(uwidth, wwidth);
         glUniform1i(uheight, wheight);
+        glUniform1f(uxmin, xmin);
+        glUniform1f(uxmax, xmax);
+        glUniform1f(uymin, ymin);
+        glUniform1f(uymax, ymax);
 
 
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 2);
@@ -145,6 +148,24 @@ void check_keys(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+    // moving around the set
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        xmin += DEFAULT_MOVEMENT_X;
+        xmax += DEFAULT_MOVEMENT_X;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        xmin -= DEFAULT_MOVEMENT_X;
+        xmax -= DEFAULT_MOVEMENT_X;
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        ymin += DEFAULT_MOVEMENT_Y;
+        ymax += DEFAULT_MOVEMENT_Y;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        ymin -= DEFAULT_MOVEMENT_Y;
+        ymax -= DEFAULT_MOVEMENT_Y;
+    }
 }
 
 void cleanup()
