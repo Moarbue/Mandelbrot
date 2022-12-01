@@ -191,6 +191,14 @@ void check_keys(GLFWwindow *window)
         ymin -= DEFAULT_MOVEMENT_Y * powf(2, -zoom);
         ymax -= DEFAULT_MOVEMENT_Y * powf(2, -zoom);
     }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        double yoffset = 10.0 * SCROLL_SENSITIVITY;
+        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+           yoffset *= -1; 
+        
+        glfw_scroll_callback(window, 0.0, yoffset);
+    }
+    
 }
 
 void cleanup()
