@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 
 #define GLFW_INCLUDE_NONE
@@ -13,9 +14,10 @@
 
 #define DEFAULT_SCREEN_WIDTH 1000
 #define DEFAULT_SCREEN_HEIGHT 1000
-#define SCROLL_SENSITIVITY 0.25f
+#define SCROLL_SENSITIVITY 0.025f
 #define DEFAULT_MOVEMENT_X 0.001f
 #define DEFAULT_MOVEMENT_Y 0.001f
+#define DEFAULT_ZOOM 0.f
 #define DEFAULT_XMIN -2.0
 #define DEFAULT_XMAX 0.47
 #define DEFAULT_YMIN -1.12
@@ -37,6 +39,9 @@ float xmin = DEFAULT_XMIN;
 float xmax = DEFAULT_XMAX;
 float ymin = DEFAULT_YMIN;
 float ymax = DEFAULT_YMAX;
+float zoom = DEFAULT_ZOOM;
+float basex = DEFAULT_XMAX - DEFAULT_XMIN;
+float basey = DEFAULT_YMAX - DEFAULT_YMIN;
 
 int main()
 {
@@ -141,7 +146,18 @@ void glfw_scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     (void)window;
     (void)xoffset;
-    (void)yoffset;
+
+    zoom += (float)yoffset * SCROLL_SENSITIVITY;
+
+    float centerx = (xmax + xmin) / 2.f;
+    float centery = (ymax + ymin) / 2.f;
+    float sizex = powf(2, -zoom) * basex;
+    float sizey = powf(2, -zoom) * basey;
+
+    xmin = centerx - sizex / 2;
+    xmax = centerx + sizex / 2;
+    ymin = centery - sizey / 2;
+    ymax = centery + sizey / 2;
 }
 
 void check_keys(GLFWwindow *window)
@@ -151,20 +167,20 @@ void check_keys(GLFWwindow *window)
 
     // moving around the set
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        xmin += DEFAULT_MOVEMENT_X;
-        xmax += DEFAULT_MOVEMENT_X;
+        xmin += DEFAULT_MOVEMENT_X * powf(2, -zoom);
+        xmax += DEFAULT_MOVEMENT_X * powf(2, -zoom);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        xmin -= DEFAULT_MOVEMENT_X;
-        xmax -= DEFAULT_MOVEMENT_X;
+        xmin -= DEFAULT_MOVEMENT_X * powf(2, -zoom);
+        xmax -= DEFAULT_MOVEMENT_X * powf(2, -zoom);
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        ymin += DEFAULT_MOVEMENT_Y;
-        ymax += DEFAULT_MOVEMENT_Y;
+        ymin += DEFAULT_MOVEMENT_Y * powf(2, -zoom);
+        ymax += DEFAULT_MOVEMENT_Y * powf(2, -zoom);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        ymin -= DEFAULT_MOVEMENT_Y;
-        ymax -= DEFAULT_MOVEMENT_Y;
+        ymin -= DEFAULT_MOVEMENT_Y * powf(2, -zoom);
+        ymax -= DEFAULT_MOVEMENT_Y * powf(2, -zoom);
     }
 }
 
