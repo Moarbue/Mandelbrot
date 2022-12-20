@@ -14,9 +14,9 @@
 
 #define DEFAULT_SCREEN_WIDTH 1000
 #define DEFAULT_SCREEN_HEIGHT 1000
-#define SCROLL_SENSITIVITY 0.025f
-#define DEFAULT_MOVEMENT_X 0.001f
-#define DEFAULT_MOVEMENT_Y 0.001f
+#define SCROLL_SENSITIVITY 0.05f
+#define DEFAULT_MOVEMENT_X 0.01f
+#define DEFAULT_MOVEMENT_Y 0.01f
 #define DEFAULT_ZOOM 0.f
 #define DEFAULT_XMIN -2.0
 #define DEFAULT_XMAX 0.47
@@ -24,6 +24,8 @@
 #define DEFAULT_YMAX 1.12
 
 #define MAX_ITERATIONS 100
+
+#define FPS_LIMIT (1.0/60.0)
 
 void glfw_error_callback(int error_code, const char *description);
 void glfw_framebuffer_resize_callback(GLFWwindow *window, int width, int height);
@@ -42,6 +44,10 @@ float ymax = DEFAULT_YMAX;
 float zoom = DEFAULT_ZOOM;
 float basex = DEFAULT_XMAX - DEFAULT_XMIN;
 float basey = DEFAULT_YMAX - DEFAULT_YMIN;
+
+double t_frame = 0.0;
+double t_lframe = 0.0;
+double t_delta = 0.0;
 
 int main()
 {
@@ -106,23 +112,30 @@ int main()
     glClearColor(0.18, 0.18, 0.18, 1.0);
 
     while (glfwWindowShouldClose(window) == GLFW_FALSE) {
-        glClear(GL_COLOR_BUFFER_BIT);
+        t_frame = glfwGetTime();
+        
+        if (t_frame - t_lframe >= FPS_LIMIT) {
+            t_delta = t_frame - t_lframe;
+            t_lframe = t_frame;
 
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        glUniform1i(uwidth, wwidth);
-        glUniform1i(uheight, wheight);
-        glUniform1f(uxmin, xmin);
-        glUniform1f(uxmax, xmax);
-        glUniform1f(uymin, ymin);
-        glUniform1f(uymax, ymax);
+            glUniform1i(uwidth, wwidth);
+            glUniform1i(uheight, wheight);
+            glUniform1f(uxmin, xmin);
+            glUniform1f(uxmax, xmax);
+            glUniform1f(uymin, ymin);
+            glUniform1f(uymax, ymax);
 
+            glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 2);
 
-        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 2);
+            glfwSwapBuffers(window);
 
-        glfwSwapBuffers(window);
+            check_keys(window);
+            glfwPollEvents();
 
-        check_keys(window);
-        glfwPollEvents();
+            printf("FPS: %d  \r", (int)(1 / t_delta));
+        }    
     }
 
     return 0;
